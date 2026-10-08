@@ -15,10 +15,19 @@ from vectors.store import store_embedding
 from graph import build_knowledge_graph
 from query.engine import QueryEngine
 from parsers.models import Symbol
+from fastapi.middleware.cors import CORSMiddleware
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="RepoSense API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root():
