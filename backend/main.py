@@ -112,7 +112,7 @@ def api_query(req: QueryRequest):
             symbols.append(sym)
             
         graph = build_knowledge_graph(symbols)
-        engine_obj = QueryEngine(db, graph)
+        engine_obj = QueryEngine(db, graph, repo_id=req.repo_id)
         
         result = engine_obj.query(req.query)
         return result

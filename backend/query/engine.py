@@ -7,10 +7,11 @@ from indexing.models import SymbolRecord
 from .llm import LLMClient
 
 class QueryEngine:
-    def __init__(self, db: Session, graph: nx.DiGraph, llm: LLMClient = None):
+    def __init__(self, db: Session, graph: nx.DiGraph, llm: LLMClient = None, repo_id: str = None):
         self.db = db
         self.graph = graph
         self.llm = llm or LLMClient()
+        self.repo_id = repo_id
         
     def _compile_prompt(self, query: str, primary_symbols: List[SymbolRecord], related_nodes: List[str]) -> str:
         prompt = f"User Query: {query}\\n\\n"
@@ -28,7 +29,7 @@ class QueryEngine:
 
     def query(self, text: str, top_k: int = 3) -> Dict[str, Any]:
         # 1. Semantic Search
-        vector_results = search_similar_symbols(self.db, text, top_k=top_k)
+        vector_results = search_similar_symbols(self.db, text, top_k=top_k, repo_id=self.repo_id)
         primary_symbols = [res[0] for res in vector_results]
         
         # 2. Knowledge Graph Expansion

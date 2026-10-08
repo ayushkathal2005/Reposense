@@ -18,16 +18,22 @@ def store_embeddings(db: Session, symbol_ids: List[int], embeddings: List[List[f
     db.add_all(records)
     db.commit()
 
-def search_similar_symbols(db: Session, query: str, top_k: int = 3) -> List[Tuple[SymbolRecord, float]]:
+def search_similar_symbols(db: Session, query: str, top_k: int = 3, repo_id: str = None) -> List[Tuple[SymbolRecord, float]]:
     query_emb = generate_embedding(query)
     query_vec = np.array(query_emb)
     
-    all_embeddings = db.query(SymbolEmbedding).all()
-    if not all_embeddings:
+    q = db.query(SymbolEmbedding, SymbolRecord).join(
+        SymbolRecord, SymbolEmbedding.symbol_id == SymbolRecord.id
+    )
+    if repo_id:
+        q = q.filter(SymbolRecord.repository_name == repo_id)
+        
+    records = q.all()
+    if not records:
         return []
         
     scores = []
-    for emb_rec in all_embeddings:
+    for emb_rec, sym_rec in records:
         target_vec = np.array(emb_rec.embedding)
         norm_q = np.linalg.norm(query_vec)
         norm_t = np.linalg.norm(target_vec)
@@ -35,16 +41,9 @@ def search_similar_symbols(db: Session, query: str, top_k: int = 3) -> List[Tupl
         if norm_q == 0 or norm_t == 0:
             score = 0.0
         else:
-            score = np.dot(query_vec, target_vec) / (norm_q * norm_t)
+            score = float(np.dot(query_vec, target_vec) / (norm_q * norm_t))
             
-        scores.append((emb_rec.symbol_id, score))
+        scores.append((sym_rec, score))
         
     scores.sort(key=lambda x: x[1], reverse=True)
-    
-    top_results = []
-    for symbol_id, score in scores[:top_k]:
-        symbol = db.query(SymbolRecord).filter(SymbolRecord.id == symbol_id).first()
-        if symbol:
-            top_results.append((symbol, float(score)))
-            
-    return top_results
+    return scores[:top_k]

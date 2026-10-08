@@ -8,7 +8,7 @@ class MockLLM(LLMClient):
     def generate(self, prompt: str) -> str:
         return f"Mock Synthesized Answer for: {prompt[:20]}..."
 
-def mock_search_similar_symbols(db, text, top_k=3):
+def mock_search_similar_symbols(db, text, top_k=3, repo_id=None):
     sym = SymbolRecord(
         id=1, 
         name="login", 
