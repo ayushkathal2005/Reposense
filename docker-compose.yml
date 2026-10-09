@@ -11,6 +11,7 @@ services:
       - reposense_data:/app/data
     environment:
       - HF_HOME=/app/data/hf_cache
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
 
   frontend:
     build:
