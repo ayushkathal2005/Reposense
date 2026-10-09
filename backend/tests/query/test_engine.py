@@ -23,7 +23,7 @@ def mock_search_similar_symbols(db, text, top_k=3, repo_id=None):
     return [(sym, 0.99)]
 
 def test_query_engine(monkeypatch):
-    monkeypatch.setattr('query.engine.search_similar_symbols', mock_search_similar_symbols)
+    monkeypatch.setattr('query.context_builder.search_similar_symbols', mock_search_similar_symbols)
     
     db = None
     graph = nx.DiGraph()
@@ -41,5 +41,5 @@ def test_query_engine(monkeypatch):
     
     prompt = result["prompt"]
     assert "User Query: How does login work?" in prompt
-    assert "login (File: auth.py, Lines: 10-15)" in prompt
+    assert "login (File: auth.py, Type: None, Lines: 10-15)" in prompt
     assert "db.verify_user" in prompt  # ensure related nodes are included

@@ -1,10 +1,9 @@
-import networkx as nx
 from typing import List, Dict, Any
 from sqlalchemy.orm import Session
-from vectors.store import search_similar_symbols
-from graph.queries import get_dependencies, get_callers
+import networkx as nx
 from indexing.models import SymbolRecord
 from .llm import LLMClient
+from .context_builder import ContextBuilder
 
 class QueryEngine:
     def __init__(self, db: Session, graph: nx.DiGraph, llm: LLMClient = None, repo_id: str = None):
@@ -13,56 +12,17 @@ class QueryEngine:
         self.llm = llm or LLMClient()
         self.repo_id = repo_id
         
-    def _compile_prompt(self, query: str, primary_symbols: List[SymbolRecord], related_nodes: List[str]) -> str:
-        prompt = (
-            "SYSTEM INSTRUCTION: You are a helpful software engineering and codebase analysis assistant. "
-            "You will be provided with context retrieved from a repository. Use this context to answer the user's question. "
-            "If the provided context does not fully contain the exact answer, use your general knowledge and intuition to deduce a reasonable answer based on standard tech stacks, file names, or common practices. "
-            "Do not refuse to answer; provide the best possible educated guess and indicate that it is inferred.\n\n"
-        )
-        prompt += f"User Query: {query}\n\n"
-        prompt += "Primary Context:\n"
-        for sym in primary_symbols:
-            prompt += f"- {sym.name} (File: {sym.file_path}, Lines: {sym.start_line}-{sym.end_line})\n"
-            prompt += f"  Docstring: {sym.docstring}\n"
-            
-        prompt += "\nRelated Components (from Knowledge Graph):\n"
-        for node in related_nodes:
-            prompt += f"- {node}\n"
-            
-        prompt += "\nPlease provide a synthesized answer based ONLY on the context above."
-        return prompt
-
     def query(self, text: str, top_k: int = 3) -> Dict[str, Any]:
-        # 1. Semantic Search
-        vector_results = search_similar_symbols(self.db, text, top_k=top_k, repo_id=self.repo_id)
-        primary_symbols = [res[0] for res in vector_results]
+        builder = ContextBuilder(self.db, self.graph, self.repo_id)
         
-        # 2. Knowledge Graph Expansion
-        related_nodes = set()
-        for sym in primary_symbols:
-            if sym.name in self.graph:
-                callers = get_callers(self.graph, sym.name)
-                deps = get_dependencies(self.graph, sym.name)
-                calls = [v for u, v, data in self.graph.out_edges(sym.name, data=True) if data.get('relationship') == 'calls']
-                related_nodes.update(callers)
-                related_nodes.update(deps)
-                related_nodes.update(calls)
-            
-        # 3. Prompt Compilation
-        prompt = self._compile_prompt(text, primary_symbols, list(related_nodes))
+        # 1. Build context via hybrid retrieval
+        context_data = builder.get_context(text)
         
-        # 4. LLM Synthesize
-        answer = self.llm.generate(prompt)
-        
-        # 5. Return result with sources
-        sources = [
-            {"name": sym.name, "file": sym.file_path, "lines": f"{sym.start_line}-{sym.end_line}"}
-            for sym in primary_symbols
-        ]
+        # 2. LLM Synthesize
+        answer = self.llm.generate(context_data["prompt"])
         
         return {
             "answer": answer,
-            "sources": sources,
-            "prompt": prompt
+            "sources": context_data["sources"],
+            "prompt": context_data["prompt"]
         }
