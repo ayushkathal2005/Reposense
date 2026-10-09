@@ -5,6 +5,9 @@ from query.llm import LLMClient
 from indexing.models import SymbolRecord
 
 class MockLLM(LLMClient):
+    def __init__(self):
+        pass  # Override __init__ so it doesn't instantiate genai.Client
+        
     def generate(self, prompt: str) -> str:
         return f"Mock Synthesized Answer for: {prompt[:20]}..."
 
