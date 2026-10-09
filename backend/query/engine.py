@@ -14,17 +14,23 @@ class QueryEngine:
         self.repo_id = repo_id
         
     def _compile_prompt(self, query: str, primary_symbols: List[SymbolRecord], related_nodes: List[str]) -> str:
-        prompt = f"User Query: {query}\\n\\n"
-        prompt += "Primary Context:\\n"
+        prompt = (
+            "SYSTEM INSTRUCTION: You are a helpful software engineering and codebase analysis assistant. "
+            "You will be provided with context retrieved from a repository. Use this context to answer the user's question. "
+            "If the provided context does not fully contain the exact answer, use your general knowledge and intuition to deduce a reasonable answer based on standard tech stacks, file names, or common practices. "
+            "Do not refuse to answer; provide the best possible educated guess and indicate that it is inferred.\n\n"
+        )
+        prompt += f"User Query: {query}\n\n"
+        prompt += "Primary Context:\n"
         for sym in primary_symbols:
-            prompt += f"- {sym.name} (File: {sym.file_path}, Lines: {sym.start_line}-{sym.end_line})\\n"
-            prompt += f"  Docstring: {sym.docstring}\\n"
+            prompt += f"- {sym.name} (File: {sym.file_path}, Lines: {sym.start_line}-{sym.end_line})\n"
+            prompt += f"  Docstring: {sym.docstring}\n"
             
-        prompt += "\\nRelated Components (from Knowledge Graph):\\n"
+        prompt += "\nRelated Components (from Knowledge Graph):\n"
         for node in related_nodes:
-            prompt += f"- {node}\\n"
+            prompt += f"- {node}\n"
             
-        prompt += "\\nPlease provide a synthesized answer based on the context above."
+        prompt += "\nPlease provide a synthesized answer based ONLY on the context above."
         return prompt
 
     def query(self, text: str, top_k: int = 3) -> Dict[str, Any]:

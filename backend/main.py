@@ -3,6 +3,10 @@ from typing import Dict
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file (if present)
+load_dotenv(Path(__file__).parent.parent / ".env")
 
 from ingestion.git_client import GitClientError
 from ingestion.service import ingest_repository
@@ -55,6 +59,30 @@ def run_ingestion(repo_id: str, url: str):
                 rel_path = str(py_file.relative_to(repo_path)).replace("\\", "/")
                 file_symbols = parse_file(py_file, rel_path)
                 symbols.extend(file_symbols)
+                
+        # Index generic important files for context
+        for target_file in ["package.json", "README.md", "requirements.txt", "pom.xml", "build.gradle"]:
+            file_path = repo_path / target_file
+            if file_path.exists():
+                try:
+                    content = file_path.read_text(encoding="utf-8")
+                    # Truncate content if it's too long
+                    if len(content) > 2000:
+                        content = content[:2000] + "..."
+                    sym = Symbol(
+                        type="file",
+                        name=target_file,
+                        file=target_file,
+                        start_line=1,
+                        end_line=content.count('\n') + 1,
+                        calls=[],
+                        dependencies=[],
+                        docstring=content,
+                        decorators=[]
+                    )
+                    symbols.append(sym)
+                except Exception:
+                    pass
                 
         index_symbols(db, repo_id, symbols, "Python")
         
