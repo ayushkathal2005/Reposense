@@ -22,7 +22,7 @@ Completed Phases
 - Phase 5 — Knowledge Graph
 - Phase 6 — Hybrid Retrieval + ContextBuilder
 Current Task
-Phase 6 verified locally. Ready for Phase 7.
+Phase 6 locked and verified. Proceeding to Phase 7 (Persistent Knowledge Graph).
 Existing Completed Work
 - [x] Initial FastAPI backend
 - [x] SQLite vector and symbol storage
@@ -36,38 +36,35 @@ Existing Completed Work
 - [x] Graph expansion during querying
 - [x] Gemini-grounded query pipeline
 - [x] Hybrid Keyword & Semantic ContextBuilder
+- [x] Deterministic relevance ranking & context budgeting
 Known Test Issue
-Some pytest execution-path errors currently require PYTHONPATH setup.
-Do NOT delete or weaken tests to hide this issue.
-Fix the test environment properly and preserve the existing test
-coverage.
+None. Resolved pytest execution-path configuration via pyproject.toml pythonpath.
 Known Technical Debt
-1. Graph is currently rebuilt dynamically on query.
+1. Graph is currently rebuilt dynamically on query (Target of Phase 7).
 2. JavaScript/TypeScript parser exists but is not integrated into the
-   main ingestion loop.
+   main ingestion loop (Target of Phase 8).
 3. Frontend Phase 16 is marked IN_PROGRESS, but Phase 6–15 backend
    intelligence work takes priority unless the current repository shows
    a concrete frontend blocker.
 Blockers
 None
 Last Verified
-2026-10-09
+2026-10-12
 Last Git Commit
 6defab3
 GitHub Push Status
-VERIFIED_LOCALLY
-This means the current work/state has been verified locally.
+PUSHED
 
 2. PHASE CHECKPOINT STATE
   Phase   Status          Commit      GitHub
-  0       COMPLETE        4a86851   VERIFIED_LOCALLY
-  1       COMPLETE        8fce635   VERIFIED_LOCALLY
-  2       COMPLETE        43e35b6   VERIFIED_LOCALLY
-  3       COMPLETE        9edd7ea   VERIFIED_LOCALLY
-  4       COMPLETE        17a4b05   VERIFIED_LOCALLY
-  5       COMPLETE        624239a   VERIFIED_LOCALLY
-  6       COMPLETE        6defab3   VERIFIED_LOCALLY
-  7       NOT_STARTED     —         —
+  0       COMPLETE        4a86851   PUSHED
+  1       COMPLETE        8fce635   PUSHED
+  2       COMPLETE        43e35b6   PUSHED
+  3       COMPLETE        9edd7ea   PUSHED
+  4       COMPLETE        17a4b05   PUSHED
+  5       COMPLETE        624239a   PUSHED
+  6       COMPLETE        6defab3   PUSHED
+  7       IN_PROGRESS     —         —
   8       NOT_STARTED     ---         ---
   9       NOT_STARTED     ---         ---
   10      NOT_STARTED     ---         ---

@@ -1,13 +1,15 @@
 import React, { Suspense } from "react";
 import RepoCodePageClient from "./RepoCodePageClient";
 
-export const dynamic = "force-dynamic";
-
-export default async function RepoCodePage({ params }: { params: Promise<{ id: string }> }) {
+async function RepoCodeContent({ params }: { params: Promise<{ id: string }> }) {
   const { id: repoId } = await params;
+  return <RepoCodePageClient repoId={repoId} />;
+}
+
+export default function RepoCodePage({ params }: { params: Promise<{ id: string }> }) {
   return (
     <Suspense fallback={<div className="p-8 text-center text-gh-text-secondary">Loading code intelligence...</div>}>
-      <RepoCodePageClient repoId={repoId} />
+      <RepoCodeContent params={params} />
     </Suspense>
   );
 }

@@ -143,7 +143,7 @@ export default function RepoCodePageClient({ repoId }: { repoId: string }) {
                             <span className="font-mono text-gh-text truncate font-semibold" title={source.name}>{source.name}</span>
                           </div>
                           <div className="text-xs font-mono text-gh-text-secondary truncate mt-auto">
-                            {source.file_path}
+                            {source.file_path || source.file}{source.lines ? `:${source.lines}` : ""}
                           </div>
                         </div>
                       ))}
