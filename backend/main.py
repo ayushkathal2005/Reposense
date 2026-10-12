@@ -18,6 +18,8 @@ from vectors.embedder import generate_embedding
 from vectors.store import store_embedding
 from graph import build_knowledge_graph, save_graph, load_graph, get_or_load_graph, inspect_graph
 from query.engine import QueryEngine
+from query.llm import LLMClient
+from tracing import ExecutionTracer, TraceRequest
 from parsers.models import Symbol
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -151,6 +153,23 @@ def api_query(req: QueryRequest):
         
         result = engine_obj.query(req.query)
         return result
+    finally:
+        db.close()
+
+
+@app.post("/api/trace")
+def api_trace(req: TraceRequest):
+    if req.repo_id not in ingestion_status or ingestion_status[req.repo_id] != "completed":
+        raise HTTPException(status_code=400, detail="Repo not found or not fully ingested")
+
+    db = SessionLocal()
+    try:
+        graph = get_or_load_graph(db, req.repo_id)
+        llm = LLMClient()
+        tracer = ExecutionTracer(graph, llm=llm)
+        query_val = req.entrypoint or req.query or ""
+        trace_result = tracer.trace(query_val, target_symbol=req.target, max_depth=req.max_depth)
+        return trace_result
     finally:
         db.close()
 
