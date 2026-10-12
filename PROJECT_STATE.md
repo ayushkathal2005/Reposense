@@ -10,7 +10,7 @@ phase-by-phase.
 
 1. CURRENT PROJECT STATE --- AUTHORITATIVE CONTEXT
 Current Phase
-PHASE 9
+PHASE 10
 Current Status
 COMPLETE
 Completed Phases
@@ -24,8 +24,9 @@ Completed Phases
 - Phase 7 — Persistent Knowledge Graph
 - Phase 8 — Multi-Language Static Analysis
 - Phase 9 — Execution Flow Tracing
+- Phase 10 — Architecture Intelligence
 Current Task
-Phase 9 complete and verified. Ready for Phase 10 (Architecture Intelligence).
+Phase 10 complete and verified. Ready for Phase 11 (Change Impact Analysis).
 Existing Completed Work
 - [x] Initial FastAPI backend
 - [x] SQLite vector and symbol storage
@@ -49,10 +50,13 @@ Existing Completed Work
 - [x] Structured ExecutionTrace models & /api/trace endpoint
 - [x] Grounded Gemini step-by-step path explanation without hallucinated hops
 - [x] 5 controlled workflow benchmarks achieving 100% path accuracy
+- [x] Static architectural layer detection (API, Controller, Service, Repo, DB, External)
+- [x] Evidence-backed Mermaid diagram generation (component & layer-level)
+- [x] Architecture API endpoint /api/repos/{repo_id}/architecture & interactive UI
 Known Test Issue
-None. All 36 tests pass with 0 failures.
+None. All 40 tests pass with 0 failures.
 Known Technical Debt
-1. Frontend Phase 16 is marked IN_PROGRESS, but Phase 10–15 backend
+1. Frontend Phase 16 is marked IN_PROGRESS, but Phase 11–15 backend
    intelligence work takes priority unless the current repository shows
    a concrete frontend blocker.
 Blockers
@@ -60,7 +64,7 @@ None
 Last Verified
 2026-10-12
 Last Git Commit
-63d6229
+phase-10
 GitHub Push Status
 PUSHED
 
@@ -76,7 +80,7 @@ PUSHED
   7       COMPLETE        638aa7a   PUSHED
   8       COMPLETE        af439a9   PUSHED
   9       COMPLETE        63d6229   PUSHED
-  10      NOT_STARTED     ---         ---
+  10      COMPLETE        [HEAD]    PUSHED
   11      NOT_STARTED     ---         ---
   12      NOT_STARTED     ---         ---
   13      NOT_STARTED     ---         ---

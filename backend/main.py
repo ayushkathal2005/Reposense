@@ -20,6 +20,7 @@ from graph import build_knowledge_graph, save_graph, load_graph, get_or_load_gra
 from query.engine import QueryEngine
 from query.llm import LLMClient
 from tracing import ExecutionTracer, TraceRequest
+from architecture import ArchitectureAnalyzer
 from parsers.models import Symbol
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -137,6 +138,18 @@ def api_repo_graph(repo_id: str):
         if not graph:
             raise HTTPException(status_code=404, detail="Graph not found for repository")
         return inspect_graph(graph)
+    finally:
+        db.close()
+
+@app.get("/api/repos/{repo_id}/architecture")
+def api_repo_architecture(repo_id: str):
+    db = SessionLocal()
+    try:
+        graph = get_or_load_graph(db, repo_id)
+        if not graph or len(graph.nodes) == 0:
+            raise HTTPException(status_code=404, detail="Repository graph not found or empty")
+        analyzer = ArchitectureAnalyzer(graph)
+        return analyzer.analyze()
     finally:
         db.close()
 
