@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
-import { Code, GitPullRequest, CircleDot, Activity, Zap, Bug, BookOpen, Settings } from "lucide-react";
+import { Code, GitPullRequest, CircleDot, Activity, GitCommit, Boxes, Zap, Bug, BookOpen, Settings } from "lucide-react";
 
 export default function RepoTabs() {
   const pathname = usePathname();
@@ -10,9 +10,9 @@ export default function RepoTabs() {
   const repoId = params.id as string;
   const tabs = [
     { name: "Code", href: `/repo/${repoId}`, icon: Code },
-    { name: "Issues", href: `/repo/${repoId}/issues`, icon: CircleDot },
-    { name: "Pull requests", href: `/repo/${repoId}/pulls`, icon: GitPullRequest },
     { name: "Architecture", href: `/repo/${repoId}/architecture`, icon: Activity },
+    { name: "Execution Flow", href: `/repo/${repoId}/trace`, icon: GitCommit },
+    { name: "Dependencies", href: `/repo/${repoId}/dependencies`, icon: Boxes },
     { name: "Impact", href: `/repo/${repoId}/impact`, icon: Zap },
     { name: "Debug", href: `/repo/${repoId}/debug`, icon: Bug },
     { name: "Docs", href: `/repo/${repoId}/docs`, icon: BookOpen },
