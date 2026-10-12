@@ -10,7 +10,7 @@ phase-by-phase.
 
 1. CURRENT PROJECT STATE --- AUTHORITATIVE CONTEXT
 Current Phase
-PHASE 11
+PHASE 12
 Current Status
 COMPLETE
 Completed Phases
@@ -26,8 +26,9 @@ Completed Phases
 - Phase 9 — Execution Flow Tracing
 - Phase 10 — Architecture Intelligence
 - Phase 11 — Change Impact Analysis
+- Phase 12 — Repository-Aware Debugging
 Current Task
-Phase 11 complete and verified. Ready for Phase 12 (Repository-Aware Debugging).
+Phase 12 complete and verified. Ready for Phase 13 (Documentation Intelligence).
 Existing Completed Work
 - [x] Initial FastAPI backend
 - [x] SQLite vector and symbol storage
@@ -57,8 +58,11 @@ Existing Completed Work
 - [x] Reverse graph traversal change impact analysis (direct & indirect dependents)
 - [x] Evidence-based risk score, risk factors, affected APIs, and affected test detection
 - [x] Change impact endpoint /api/impact & interactive frontend Impact tab
+- [x] Python, JavaScript, and TypeScript error traceback and exception parsing
+- [x] Grounded root-cause diagnosis strictly distinguishing FACT, INFERENCE, and POSSIBLE CAUSE
+- [x] Debug endpoint /api/debug and interactive frontend Debug tab with preset scenarios
 Known Test Issue
-None. All 45 tests pass with 0 failures.
+None. All 50 tests pass with 0 failures.
 Known Technical Debt
 1. Frontend Phase 16 is marked IN_PROGRESS, but Phase 11–15 backend
    intelligence work takes priority unless the current repository shows
@@ -68,7 +72,7 @@ None
 Last Verified
 2026-10-13
 Last Git Commit
-42240bd
+1844b98
 GitHub Push Status
 PUSHED
 
@@ -86,7 +90,7 @@ PUSHED
   9       COMPLETE        63d6229   PUSHED
   10      COMPLETE        8ef0a3a   PUSHED
   11      COMPLETE        42240bd   PUSHED
-  12      NOT_STARTED     ---         ---
+  12      COMPLETE        1844b98   PUSHED
   13      NOT_STARTED     ---         ---
   14      NOT_STARTED     ---         ---
   15      NOT_STARTED     ---         ---
