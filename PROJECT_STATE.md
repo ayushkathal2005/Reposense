@@ -10,7 +10,7 @@ phase-by-phase.
 
 1. CURRENT PROJECT STATE --- AUTHORITATIVE CONTEXT
 Current Phase
-PHASE 7
+PHASE 8
 Current Status
 COMPLETE
 Completed Phases
@@ -22,8 +22,9 @@ Completed Phases
 - Phase 5 — Knowledge Graph
 - Phase 6 — Hybrid Retrieval + ContextBuilder
 - Phase 7 — Persistent Knowledge Graph
+- Phase 8 — Multi-Language Static Analysis
 Current Task
-Phase 7 complete and verified. Ready for Phase 8 (Multi-Language Static Analysis).
+Phase 8 complete and verified. Ready for Phase 9 (Execution Flow Tracing).
 Existing Completed Work
 - [x] Initial FastAPI backend
 - [x] SQLite vector and symbol storage
@@ -40,12 +41,13 @@ Existing Completed Work
 - [x] Deterministic relevance ranking & context budgeting
 - [x] Ingestion-time persistent knowledge graph storage & caching
 - [x] Graph inspection API & UI architecture visualization
+- [x] Multi-language static analysis for Python, JavaScript, and TypeScript
+- [x] Integration of Tree-sitter JS/TS parsers into main ingestion loop
+- [x] Multi-language test fixtures with >=90% extraction accuracy
 Known Test Issue
-None. All 21 tests pass with 0 failures.
+None. All 27 tests pass with 0 failures.
 Known Technical Debt
-1. JavaScript/TypeScript parser exists but is not integrated into the
-   main ingestion loop (Target of Phase 8).
-2. Frontend Phase 16 is marked IN_PROGRESS, but Phase 8–15 backend
+1. Frontend Phase 16 is marked IN_PROGRESS, but Phase 9–15 backend
    intelligence work takes priority unless the current repository shows
    a concrete frontend blocker.
 Blockers
@@ -53,7 +55,7 @@ None
 Last Verified
 2026-10-12
 Last Git Commit
-638aa7a
+phase-08
 GitHub Push Status
 PUSHED
 
@@ -67,7 +69,7 @@ PUSHED
   5       COMPLETE        624239a   PUSHED
   6       COMPLETE        6defab3   PUSHED
   7       COMPLETE        638aa7a   PUSHED
-  8       NOT_STARTED     ---         ---
+  8       COMPLETE        [HEAD]    PUSHED
   9       NOT_STARTED     ---         ---
   10      NOT_STARTED     ---         ---
   11      NOT_STARTED     ---         ---

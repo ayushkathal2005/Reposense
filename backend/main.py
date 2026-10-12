@@ -54,11 +54,18 @@ def run_ingestion(repo_id: str, url: str):
         repo_path = base_dir / metadata.name
         
         symbols = []
-        for py_file in repo_path.rglob("*.py"):
-            if "venv" not in py_file.parts and "tests" not in py_file.parts:
-                rel_path = str(py_file.relative_to(repo_path)).replace("\\", "/")
-                file_symbols = parse_file(py_file, rel_path)
-                symbols.extend(file_symbols)
+        ignored_dirs = {
+            ".git", "node_modules", "venv", ".venv", "__pycache__",
+            "dist", "build", "coverage", ".next"
+        }
+        supported_exts = {".py", ".js", ".jsx", ".mjs", ".cjs", ".ts", ".tsx", ".mts", ".cts"}
+
+        for file_path in repo_path.rglob("*"):
+            if file_path.is_file() and file_path.suffix.lower() in supported_exts:
+                if not any(part in ignored_dirs for part in file_path.parts):
+                    rel_path = str(file_path.relative_to(repo_path)).replace("\\", "/")
+                    file_symbols = parse_file(file_path, rel_path)
+                    symbols.extend(file_symbols)
                 
         # Index generic important files for context
         for target_file in ["package.json", "README.md", "requirements.txt", "pom.xml", "build.gradle"]:
@@ -73,6 +80,7 @@ def run_ingestion(repo_id: str, url: str):
                         type="file",
                         name=target_file,
                         file=target_file,
+                        language="Config",
                         start_line=1,
                         end_line=content.count('\n') + 1,
                         calls=[],
@@ -84,7 +92,7 @@ def run_ingestion(repo_id: str, url: str):
                 except Exception:
                     pass
                 
-        index_symbols(db, repo_id, symbols, "Python")
+        index_symbols(db, repo_id, symbols)
         
         records = db.query(SymbolRecord).filter(SymbolRecord.repository_name == repo_id).all()
         for record in records:

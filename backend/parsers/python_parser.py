@@ -2,6 +2,7 @@ import ast
 from pathlib import Path
 from typing import List
 from .models import Symbol
+from .base import BaseParser
 
 class PythonCodeVisitor(ast.NodeVisitor):
     def __init__(self, file_path: str):
@@ -15,6 +16,7 @@ class PythonCodeVisitor(ast.NodeVisitor):
                 type="import",
                 name=alias.name,
                 file=self.file_path,
+                language="Python",
                 start_line=node.lineno,
                 end_line=node.end_lineno or node.lineno,
                 dependencies=[alias.name]
@@ -29,6 +31,7 @@ class PythonCodeVisitor(ast.NodeVisitor):
                     type="import",
                     name=name,
                     file=self.file_path,
+                    language="Python",
                     start_line=node.lineno,
                     end_line=node.end_lineno or node.lineno,
                     dependencies=[node.module]
@@ -79,6 +82,7 @@ class PythonCodeVisitor(ast.NodeVisitor):
             type="class",
             name=node.name,
             file=self.file_path,
+            language="Python",
             start_line=node.lineno,
             end_line=node.end_lineno or node.lineno,
             calls=calls,
@@ -112,6 +116,7 @@ class PythonCodeVisitor(ast.NodeVisitor):
             type=sym_type,
             name=name,
             file=self.file_path,
+            language="Python",
             start_line=node.lineno,
             end_line=node.end_lineno or node.lineno,
             calls=calls,
@@ -132,3 +137,15 @@ def parse_python_file(file_path: Path, relative_path: str) -> List[Symbol]:
     except Exception as e:
         print(f"Error parsing python file {relative_path}: {e}")
         return []
+
+class PythonParser(BaseParser):
+    @property
+    def language_name(self) -> str:
+        return "Python"
+
+    @property
+    def supported_extensions(self) -> List[str]:
+        return [".py"]
+
+    def parse(self, file_path: Path, relative_path: str) -> List[Symbol]:
+        return parse_python_file(file_path, relative_path)

@@ -4,15 +4,16 @@ from .models import SymbolRecord
 from typing import List, Optional
 from parsers import Symbol
 
-def index_symbols(db: Session, repository_name: str, symbols: List[Symbol], language: str):
+def index_symbols(db: Session, repository_name: str, symbols: List[Symbol], language: Optional[str] = None):
     records = []
     for s in symbols:
+        sym_lang = s.language or language or "Unknown"
         record = SymbolRecord(
             repository_name=repository_name,
             type=s.type,
             name=s.name,
             file_path=s.file,
-            language=language,
+            language=sym_lang,
             start_line=s.start_line,
             end_line=s.end_line,
             calls=s.calls,
