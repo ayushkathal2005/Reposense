@@ -22,6 +22,7 @@ from query.llm import LLMClient
 from tracing import ExecutionTracer, TraceRequest
 from architecture import ArchitectureAnalyzer
 from impact import ChangeImpactAnalyzer, ImpactRequest
+from debugging import RepoDebugger, DebugRequest
 from parsers.models import Symbol
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -208,6 +209,32 @@ def api_impact(req: ImpactRequest):
             file_path=req.file_path,
             max_depth=req.max_depth
         )
+        return result
+    finally:
+        db.close()
+
+
+@app.post("/api/debug")
+def api_debug(req: DebugRequest):
+    if req.repo_id in ingestion_status and ingestion_status[req.repo_id] == "processing":
+        raise HTTPException(status_code=400, detail="Repo ingestion still in progress")
+
+    db = SessionLocal()
+    try:
+        graph = get_or_load_graph(db, req.repo_id)
+        if not graph or len(graph.nodes) == 0:
+            raise HTTPException(status_code=404, detail="Repository graph not found or empty")
+
+        base_dir = Path.cwd() / "data" / "repos"
+        repo_path = None
+        for child in base_dir.glob("*"):
+            if child.is_dir():
+                repo_path = child
+                break
+
+        llm = LLMClient()
+        debugger = RepoDebugger(graph, base_repo_path=repo_path, llm=llm)
+        result = debugger.analyze(req)
         return result
     finally:
         db.close()
