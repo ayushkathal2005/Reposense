@@ -1,12 +1,24 @@
 "use client";
 
 import React, { useState } from "react";
-import { Folder, FileText, Search, CornerDownRight, Check, Copy, ExternalLink, Box, Terminal } from "lucide-react";
+import { Folder, FileText, Search, CornerDownRight, Check, Copy, ExternalLink, Box, Terminal, AlertTriangle, ShieldCheck, Tag } from "lucide-react";
+
+interface AnalysisResult {
+  answer: string;
+  confidence?: "high" | "medium" | "low";
+  evidence?: Array<{ file: string; line?: number; symbol?: string; snippet?: string }>;
+  related_symbols?: string[];
+  source_references?: string[];
+  warnings?: string[];
+  unresolved?: string[];
+  sources?: any[];
+  prompt?: string;
+}
 
 export default function RepoCodePageClient({ repoId }: { repoId: string }) {
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<{ answer: string; sources: any[]; prompt: string } | null>(null);
+  const [result, setResult] = useState<AnalysisResult | null>(null);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,17 +123,48 @@ export default function RepoCodePageClient({ repoId }: { repoId: string }) {
           ) : result ? (
             <div className="flex-1 flex flex-col overflow-hidden">
               <div className="bg-gh-bg border-b border-gh-border px-4 py-3 flex justify-between items-center shrink-0">
-                <h3 className="font-semibold text-sm text-gh-text flex items-center gap-2">
-                  <Terminal size={16} /> Analysis Result
-                </h3>
+                <div className="flex items-center gap-3">
+                  <h3 className="font-semibold text-sm text-gh-text flex items-center gap-2">
+                    <Terminal size={16} /> Analysis Result
+                  </h3>
+                  {result.confidence && (
+                    <span
+                      className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                        result.confidence === "high"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-300"
+                          : result.confidence === "medium"
+                          ? "bg-amber-50 text-amber-700 border-amber-300"
+                          : "bg-gray-100 text-gray-700 border-gray-300"
+                      }`}
+                    >
+                      {result.confidence.toUpperCase()} CONFIDENCE
+                    </span>
+                  )}
+                </div>
                 <div className="flex gap-2">
-                  <button className="p-1 hover:bg-gray-200 rounded text-gh-text-secondary" title="Copy result">
+                  <button
+                    onClick={() => navigator.clipboard.writeText(result.answer)}
+                    className="p-1 hover:bg-gray-200 rounded text-gh-text-secondary"
+                    title="Copy result"
+                  >
                     <Copy size={16} />
                   </button>
                 </div>
               </div>
               
-              <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-8">
+              <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
+                {/* Warnings Section */}
+                {result.warnings && result.warnings.length > 0 && (
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-md text-xs text-amber-800 space-y-1">
+                    {result.warnings.map((w, idx) => (
+                      <div key={idx} className="flex items-center gap-1.5">
+                        <AlertTriangle size={14} className="shrink-0 text-amber-600" />
+                        <span>{w}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 {/* Answer Section */}
                 <div>
                   <div className="prose prose-sm max-w-none text-gh-text font-sans">
@@ -130,6 +173,22 @@ export default function RepoCodePageClient({ repoId }: { repoId: string }) {
                     ))}
                   </div>
                 </div>
+
+                {/* Related Symbols */}
+                {result.related_symbols && result.related_symbols.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-semibold text-gh-text-secondary uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                      <Tag size={13} /> Related Symbols
+                    </h4>
+                    <div className="flex flex-wrap gap-1.5">
+                      {result.related_symbols.map((sym, idx) => (
+                        <span key={idx} className="px-2 py-0.5 rounded bg-gray-100 border border-gh-border text-xs font-mono text-gh-text">
+                          {sym}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Sources Section */}
                 {result.sources && result.sources.length > 0 && (
