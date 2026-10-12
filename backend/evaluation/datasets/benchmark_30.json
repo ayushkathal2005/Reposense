@@ -1,0 +1,250 @@
+[
+  {
+    "id": "sym_01",
+    "category": "symbol_lookup",
+    "query": "Where is the function `login` defined?",
+    "target_symbol": "login",
+    "expected_files": ["auth.py", "src/auth.py", "controllers/auth.py"],
+    "expected_type": "function"
+  },
+  {
+    "id": "sym_02",
+    "category": "symbol_lookup",
+    "query": "Find the definition of `PaymentService.process_payment`",
+    "target_symbol": "PaymentService.process_payment",
+    "expected_files": ["services/payment_service.py", "services/payment.py"],
+    "expected_type": "method"
+  },
+  {
+    "id": "sym_03",
+    "category": "symbol_lookup",
+    "query": "Show me the `OrderRepository` class declaration",
+    "target_symbol": "OrderRepository",
+    "expected_files": ["repositories/order_repo.py", "repositories/order.py"],
+    "expected_type": "class"
+  },
+  {
+    "id": "sym_04",
+    "category": "symbol_lookup",
+    "query": "Where is `create_order_endpoint` implemented?",
+    "target_symbol": "create_order_endpoint",
+    "expected_files": ["api/routes.py", "src/api/orders.py"],
+    "expected_type": "route"
+  },
+  {
+    "id": "file_01",
+    "category": "file_lookup",
+    "query": "Which file defines the database session and engine?",
+    "target_symbol": "engine",
+    "expected_files": ["indexing/database.py", "database.py", "src/db.py"],
+    "expected_type": "variable"
+  },
+  {
+    "id": "file_02",
+    "category": "file_lookup",
+    "query": "Locate the source code for user authentication routes",
+    "target_symbol": "auth",
+    "expected_files": ["src/api/users.py", "api/auth.py"],
+    "expected_type": "file"
+  },
+  {
+    "id": "file_03",
+    "category": "file_lookup",
+    "query": "Which file contains package configuration for the frontend?",
+    "target_symbol": "package.json",
+    "expected_files": ["package.json"],
+    "expected_type": "file"
+  },
+  {
+    "id": "file_04",
+    "category": "file_lookup",
+    "query": "Where are the tree-sitter parsers configured?",
+    "target_symbol": "parse_file",
+    "expected_files": ["parsers/__init__.py", "parsers/base.py"],
+    "expected_type": "function"
+  },
+  {
+    "id": "dep_01",
+    "category": "dependency_questions",
+    "query": "What dependencies does `OrderService` rely on?",
+    "target_symbol": "OrderService",
+    "expected_dependencies": ["PaymentGateway", "OrderRepository", "StripeClient"],
+    "expected_files": ["services/order.py"]
+  },
+  {
+    "id": "dep_02",
+    "category": "dependency_questions",
+    "query": "What does `PaymentService.process_payment` invoke?",
+    "target_symbol": "PaymentService.process_payment",
+    "expected_dependencies": ["StripeGateway.charge"],
+    "expected_files": ["services/payment_service.py"]
+  },
+  {
+    "id": "dep_03",
+    "category": "dependency_questions",
+    "query": "Which components depend on `UserRepository`?",
+    "target_symbol": "UserRepository",
+    "expected_callers": ["UserService", "UserController"],
+    "expected_files": ["repositories/user_repo.py"]
+  },
+  {
+    "id": "dep_04",
+    "category": "dependency_questions",
+    "query": "What external services are called by `StripeClient`?",
+    "target_symbol": "StripeClient",
+    "expected_dependencies": ["HttpStripeClient.post"],
+    "expected_files": ["gateways/stripe_client.py"]
+  },
+  {
+    "id": "flow_01",
+    "category": "execution_flow",
+    "query": "What happens when a user creates an order?",
+    "target_symbol": "create_order_endpoint",
+    "expected_path": [
+      "create_order_endpoint",
+      "OrderController.create",
+      "OrderService.process_order",
+      "OrderRepository.save"
+    ]
+  },
+  {
+    "id": "flow_02",
+    "category": "execution_flow",
+    "query": "Trace the payment execution flow from order checkout",
+    "target_symbol": "OrderController.checkout",
+    "expected_path": [
+      "OrderController.checkout",
+      "OrderService.place_order",
+      "PaymentService.process_payment",
+      "StripeGateway.charge"
+    ]
+  },
+  {
+    "id": "flow_03",
+    "category": "execution_flow",
+    "query": "Trace user authentication from endpoint to password check",
+    "target_symbol": "login",
+    "expected_path": [
+      "login",
+      "verify_password"
+    ]
+  },
+  {
+    "id": "flow_04",
+    "category": "execution_flow",
+    "query": "Trace user profile lookup from endpoint to database model",
+    "target_symbol": "get_user_endpoint",
+    "expected_path": [
+      "get_user_endpoint",
+      "UserController.get_profile",
+      "UserService.get_user",
+      "UserRepository.find_by_id"
+    ]
+  },
+  {
+    "id": "arch_01",
+    "category": "architecture",
+    "query": "What are the primary layers of this application?",
+    "expected_layers": ["api", "controller", "service", "repository", "database"]
+  },
+  {
+    "id": "arch_02",
+    "category": "architecture",
+    "query": "Does the API layer call the repository directly without a service?",
+    "expected_answer_pattern": "layer_separation"
+  },
+  {
+    "id": "arch_03",
+    "category": "architecture",
+    "query": "Identify all external service gateways in the codebase",
+    "expected_components": ["StripeClient", "PaymentGateway"]
+  },
+  {
+    "id": "arch_04",
+    "category": "architecture",
+    "query": "Show the dependency direction between controllers and services",
+    "expected_direction": "Controller -> Service"
+  },
+  {
+    "id": "impact_01",
+    "category": "impact_analysis",
+    "query": "What is the blast radius if I modify `PaymentService.process_payment`?",
+    "target_symbol": "PaymentService.process_payment",
+    "expected_risk": "HIGH",
+    "expected_direct_dependents": ["OrderService.place_order", "OrderService.process_order"]
+  },
+  {
+    "id": "impact_02",
+    "category": "impact_analysis",
+    "query": "What callers are affected if `OrderRepository.save` changes its signature?",
+    "target_symbol": "OrderRepository.save",
+    "expected_direct_dependents": ["OrderService.process_order", "OrderService.place_order"]
+  },
+  {
+    "id": "impact_03",
+    "category": "impact_analysis",
+    "query": "Is `checkout_endpoint` safe to change without affecting upstream internal callers?",
+    "target_symbol": "checkout_endpoint",
+    "expected_risk": "LOW"
+  },
+  {
+    "id": "impact_04",
+    "category": "impact_analysis",
+    "query": "What tests must be rerun if `PaymentService.process_payment` changes?",
+    "target_symbol": "PaymentService.process_payment",
+    "expected_tests": ["test_process_payment"]
+  },
+  {
+    "id": "debug_01",
+    "category": "debugging",
+    "query": "KeyError: 'user_id' in src/api/users.py:81",
+    "error_message": "KeyError: 'user_id'",
+    "stack_trace": "File \"src/api/users.py\", line 81, in get_user_profile\n    return user_data[\"user_id\"]",
+    "expected_file": "src/api/users.py",
+    "expected_line": 81,
+    "expected_cause_type": "missing_dict_key"
+  },
+  {
+    "id": "debug_02",
+    "category": "debugging",
+    "query": "AttributeError: 'NoneType' object has no attribute 'charge'",
+    "error_message": "AttributeError: 'NoneType' object has no attribute 'charge'",
+    "stack_trace": "File \"src/services/payment.py\", line 42, in process_payment\n    gateway.charge(amount)",
+    "expected_file": "src/services/payment.py",
+    "expected_line": 42,
+    "expected_cause_type": "null_dereference"
+  },
+  {
+    "id": "debug_03",
+    "category": "debugging",
+    "query": "TypeError: Cannot read properties of undefined (reading 'charge')",
+    "error_message": "TypeError: Cannot read properties of undefined (reading 'charge')",
+    "stack_trace": "at PaymentService.charge (src/services/payment.ts:45:12)",
+    "expected_file": "src/services/payment.ts",
+    "expected_line": 45,
+    "expected_cause_type": "undefined_property"
+  },
+  {
+    "id": "doc_01",
+    "category": "documentation",
+    "query": "Generate API documentation for POST /api/orders",
+    "doc_type": "api",
+    "target": "/api/orders",
+    "expected_sections": ["Handler Symbol", "Downstream Service"]
+  },
+  {
+    "id": "doc_02",
+    "category": "documentation",
+    "query": "Generate documentation for `OrderService.process_order`",
+    "doc_type": "function",
+    "target": "OrderService.process_order",
+    "expected_sections": ["Inward Callers", "Outward Invocations"]
+  },
+  {
+    "id": "doc_03",
+    "category": "documentation",
+    "query": "Generate system architecture layer documentation",
+    "doc_type": "architecture",
+    "expected_sections": ["Architecture Overview", "API / Routes", "Services"]
+  }
+]
