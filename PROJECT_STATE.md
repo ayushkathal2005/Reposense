@@ -10,7 +10,7 @@ phase-by-phase.
 
 1. CURRENT PROJECT STATE --- AUTHORITATIVE CONTEXT
 Current Phase
-PHASE 14
+PHASE 15
 Current Status
 COMPLETE
 Completed Phases
@@ -29,8 +29,9 @@ Completed Phases
 - Phase 12 — Repository-Aware Debugging
 - Phase 13 — Documentation Intelligence
 - Phase 14 — Structured Grounded Analysis
+- Phase 15 — Evaluation Framework
 Current Task
-Phase 14 complete and verified. Ready for Phase 15 (Evaluation Framework).
+Phase 15 complete and verified. Ready for Phase 16 (Frontend Productization).
 Existing Completed Work
 - [x] Initial FastAPI backend
 - [x] SQLite vector and symbol storage
@@ -68,8 +69,11 @@ Existing Completed Work
 - [x] Standardized structured response models (AnalysisResponse, EvidenceItem, ExecutionTraceResponse, etc.)
 - [x] Enforced confidence levels, source references, warnings, and related symbols in QueryEngine
 - [x] Frontend consumption of structured analysis schemas in main code exploration view
+- [x] 30-question empirical evaluation benchmark across all 8 intelligence categories
+- [x] Deterministic scoring metrics (Recall@5, Evidence Correctness, Path Accuracy, Citation Correctness, Hallucination Rate)
+- [x] Automated benchmark runner with report serialization
 Known Test Issue
-None. All 57 tests pass with 0 failures.
+None. All 60 tests pass with 0 failures.
 Known Technical Debt
 1. Frontend Phase 16 is marked IN_PROGRESS, but Phase 11–15 backend
    intelligence work takes priority unless the current repository shows
@@ -79,7 +83,7 @@ None
 Last Verified
 2026-10-13
 Last Git Commit
-53a37b5
+1984624
 GitHub Push Status
 PUSHED
 
@@ -100,7 +104,7 @@ PUSHED
   12      COMPLETE        1844b98   PUSHED
   13      COMPLETE        316fca4   PUSHED
   14      COMPLETE        53a37b5   PUSHED
-  15      NOT_STARTED     ---         ---
+  15      COMPLETE        1984624   PUSHED
   16      IN_PROGRESS*   ---         ---
   17      NOT_STARTED     ---         ---
 * Phase 16 may contain existing frontend work. Do not assume it is
