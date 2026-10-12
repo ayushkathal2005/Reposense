@@ -16,7 +16,7 @@ from indexing.models import Base, SymbolRecord
 from indexing.service import index_symbols
 from vectors.embedder import generate_embedding
 from vectors.store import store_embedding
-from graph import build_knowledge_graph
+from graph import build_knowledge_graph, save_graph, load_graph, get_or_load_graph, inspect_graph
 from query.engine import QueryEngine
 from parsers.models import Symbol
 from fastapi.middleware.cors import CORSMiddleware
@@ -92,6 +92,10 @@ def run_ingestion(repo_id: str, url: str):
             emb = generate_embedding(text_to_embed)
             store_embedding(db, record.id, emb)
             
+        # Build and persist knowledge graph during ingestion
+        graph = build_knowledge_graph(symbols, repo_id=repo_id)
+        save_graph(db, repo_id, graph)
+
         ingestion_status[repo_id] = "completed"
     except Exception as e:
         import traceback
@@ -115,6 +119,17 @@ def api_repo_status(repo_id: str):
         raise HTTPException(status_code=404, detail="Repo ID not found")
     return {"repo_id": repo_id, "status": ingestion_status[repo_id]}
 
+@app.get("/api/repos/{repo_id}/graph")
+def api_repo_graph(repo_id: str):
+    db = SessionLocal()
+    try:
+        graph = load_graph(db, repo_id)
+        if not graph:
+            raise HTTPException(status_code=404, detail="Graph not found for repository")
+        return inspect_graph(graph)
+    finally:
+        db.close()
+
 @app.post("/api/query")
 def api_query(req: QueryRequest):
     if req.repo_id not in ingestion_status or ingestion_status[req.repo_id] != "completed":
@@ -122,24 +137,8 @@ def api_query(req: QueryRequest):
         
     db = SessionLocal()
     try:
-        records = db.query(SymbolRecord).filter(SymbolRecord.repository_name == req.repo_id).all()
-        
-        symbols = []
-        for r in records:
-            sym = Symbol(
-                type=r.type,
-                name=r.name,
-                file=r.file_path,
-                start_line=r.start_line,
-                end_line=r.end_line,
-                calls=r.calls or [],
-                dependencies=r.dependencies or [],
-                docstring=r.docstring,
-                decorators=r.decorators or []
-            )
-            symbols.append(sym)
-            
-        graph = build_knowledge_graph(symbols)
+        # Retrieve persistent knowledge graph directly without rebuilding
+        graph = get_or_load_graph(db, req.repo_id)
         engine_obj = QueryEngine(db, graph, repo_id=req.repo_id)
         
         result = engine_obj.query(req.query)

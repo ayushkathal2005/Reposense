@@ -10,7 +10,7 @@ phase-by-phase.
 
 1. CURRENT PROJECT STATE --- AUTHORITATIVE CONTEXT
 Current Phase
-PHASE 6
+PHASE 7
 Current Status
 COMPLETE
 Completed Phases
@@ -21,8 +21,9 @@ Completed Phases
 - Phase 4 — Embeddings / Vector Storage
 - Phase 5 — Knowledge Graph
 - Phase 6 — Hybrid Retrieval + ContextBuilder
+- Phase 7 — Persistent Knowledge Graph
 Current Task
-Phase 6 locked and verified. Proceeding to Phase 7 (Persistent Knowledge Graph).
+Phase 7 complete and verified. Ready for Phase 8 (Multi-Language Static Analysis).
 Existing Completed Work
 - [x] Initial FastAPI backend
 - [x] SQLite vector and symbol storage
@@ -37,13 +38,14 @@ Existing Completed Work
 - [x] Gemini-grounded query pipeline
 - [x] Hybrid Keyword & Semantic ContextBuilder
 - [x] Deterministic relevance ranking & context budgeting
+- [x] Ingestion-time persistent knowledge graph storage & caching
+- [x] Graph inspection API & UI architecture visualization
 Known Test Issue
-None. Resolved pytest execution-path configuration via pyproject.toml pythonpath.
+None. All 21 tests pass with 0 failures.
 Known Technical Debt
-1. Graph is currently rebuilt dynamically on query (Target of Phase 7).
-2. JavaScript/TypeScript parser exists but is not integrated into the
+1. JavaScript/TypeScript parser exists but is not integrated into the
    main ingestion loop (Target of Phase 8).
-3. Frontend Phase 16 is marked IN_PROGRESS, but Phase 6–15 backend
+2. Frontend Phase 16 is marked IN_PROGRESS, but Phase 8–15 backend
    intelligence work takes priority unless the current repository shows
    a concrete frontend blocker.
 Blockers
@@ -51,7 +53,7 @@ None
 Last Verified
 2026-10-12
 Last Git Commit
-6defab3
+phase-07
 GitHub Push Status
 PUSHED
 
@@ -64,7 +66,7 @@ PUSHED
   4       COMPLETE        17a4b05   PUSHED
   5       COMPLETE        624239a   PUSHED
   6       COMPLETE        6defab3   PUSHED
-  7       IN_PROGRESS     —         —
+  7       COMPLETE        [HEAD]    PUSHED
   8       NOT_STARTED     ---         ---
   9       NOT_STARTED     ---         ---
   10      NOT_STARTED     ---         ---

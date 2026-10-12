@@ -9,11 +9,14 @@ def get_callers(G: nx.DiGraph, target: str) -> List[str]:
 def get_dependencies(G: nx.DiGraph, target: str) -> List[str]:
     if target not in G:
         return []
-    return [v for u, v, data in G.out_edges(target, data=True) if data.get('relationship') == 'depends_on']
+    return [
+        v for u, v, data in G.out_edges(target, data=True) 
+        if data.get('relationship') in ('depends_on', 'inherits', 'uses')
+    ]
 
 def find_shortest_path(G: nx.DiGraph, source: str, target: str) -> Tuple[List[str], int, int]:
     try:
-        # We use undirected graph to find ANY link for "distant components path" 
+        # Use undirected projection to find connection across graph components
         U = G.to_undirected()
         path = nx.shortest_path(U, source=source, target=target)
         
