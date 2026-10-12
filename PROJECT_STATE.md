@@ -10,7 +10,7 @@ phase-by-phase.
 
 1. CURRENT PROJECT STATE --- AUTHORITATIVE CONTEXT
 Current Phase
-PHASE 10
+PHASE 11
 Current Status
 COMPLETE
 Completed Phases
@@ -25,8 +25,9 @@ Completed Phases
 - Phase 8 — Multi-Language Static Analysis
 - Phase 9 — Execution Flow Tracing
 - Phase 10 — Architecture Intelligence
+- Phase 11 — Change Impact Analysis
 Current Task
-Phase 10 complete and verified. Ready for Phase 11 (Change Impact Analysis).
+Phase 11 complete and verified. Ready for Phase 12 (Repository-Aware Debugging).
 Existing Completed Work
 - [x] Initial FastAPI backend
 - [x] SQLite vector and symbol storage
@@ -53,8 +54,11 @@ Existing Completed Work
 - [x] Static architectural layer detection (API, Controller, Service, Repo, DB, External)
 - [x] Evidence-backed Mermaid diagram generation (component & layer-level)
 - [x] Architecture API endpoint /api/repos/{repo_id}/architecture & interactive UI
+- [x] Reverse graph traversal change impact analysis (direct & indirect dependents)
+- [x] Evidence-based risk score, risk factors, affected APIs, and affected test detection
+- [x] Change impact endpoint /api/impact & interactive frontend Impact tab
 Known Test Issue
-None. All 40 tests pass with 0 failures.
+None. All 45 tests pass with 0 failures.
 Known Technical Debt
 1. Frontend Phase 16 is marked IN_PROGRESS, but Phase 11–15 backend
    intelligence work takes priority unless the current repository shows
@@ -62,9 +66,9 @@ Known Technical Debt
 Blockers
 None
 Last Verified
-2026-10-12
+2026-10-13
 Last Git Commit
-8ef0a3a
+42240bd
 GitHub Push Status
 PUSHED
 
@@ -81,7 +85,7 @@ PUSHED
   8       COMPLETE        af439a9   PUSHED
   9       COMPLETE        63d6229   PUSHED
   10      COMPLETE        8ef0a3a   PUSHED
-  11      NOT_STARTED     ---         ---
+  11      COMPLETE        42240bd   PUSHED
   12      NOT_STARTED     ---         ---
   13      NOT_STARTED     ---         ---
   14      NOT_STARTED     ---         ---
