@@ -62,51 +62,96 @@ def run_ingestion(repo_id: str, url: str):
         symbols = []
         ignored_dirs = {
             ".git", "node_modules", "venv", ".venv", "__pycache__",
-            "dist", "build", "coverage", ".next"
+            "dist", "build", "coverage", ".next", ".idea", ".vscode"
         }
+        secret_file_patterns = {
+            ".env", ".env.local", ".env.production", ".env.development",
+            "id_rsa", "id_ecdsa", "id_ed25519", "credentials.json",
+            "service_account.json"
+        }
+        secret_extensions = {".pem", ".key", ".p12", ".pfx"}
         supported_exts = {".py", ".js", ".jsx", ".mjs", ".cjs", ".ts", ".tsx", ".mts", ".cts"}
 
+        MAX_FILE_SIZE = 2 * 1024 * 1024  # 2MB cap per source file
+
         for file_path in repo_path.rglob("*"):
-            if file_path.is_file() and file_path.suffix.lower() in supported_exts:
-                if not any(part in ignored_dirs for part in file_path.parts):
+            if not file_path.is_file():
+                continue
+
+            # 1. Security: Path Traversal check
+            try:
+                resolved_file = file_path.resolve()
+                if not resolved_file.is_relative_to(repo_path.resolve()):
+                    continue
+            except Exception:
+                continue
+
+            # 2. Security: Ignore secret and credential files
+            fname_lower = file_path.name.lower()
+            if (
+                fname_lower in secret_file_patterns
+                or fname_lower.startswith(".env.")
+                or file_path.suffix.lower() in secret_extensions
+            ):
+                continue
+
+            # 3. Security: Enforce single-file size ceiling
+            try:
+                if file_path.stat().st_size > MAX_FILE_SIZE:
+                    continue
+            except Exception:
+                continue
+
+            # 4. Check directory filters
+            if any(part in ignored_dirs for part in file_path.parts):
+                continue
+
+            # 5. Safe Parsing with per-file fault tolerance
+            if file_path.suffix.lower() in supported_exts:
+                try:
                     rel_path = str(file_path.relative_to(repo_path)).replace("\\", "/")
                     file_symbols = parse_file(file_path, rel_path)
                     symbols.extend(file_symbols)
-                
-        # Index generic important files for context
+                except Exception as parse_err:
+                    print(f"Warning: Failed to parse {file_path.name}: {parse_err}")
+
+        # Index generic important files for context (with safe size limit)
         for target_file in ["package.json", "README.md", "requirements.txt", "pom.xml", "build.gradle"]:
             file_path = repo_path / target_file
             if file_path.exists():
                 try:
-                    content = file_path.read_text(encoding="utf-8")
-                    # Truncate content if it's too long
-                    if len(content) > 2000:
-                        content = content[:2000] + "..."
-                    sym = Symbol(
-                        type="file",
-                        name=target_file,
-                        file=target_file,
-                        language="Config",
-                        start_line=1,
-                        end_line=content.count('\n') + 1,
-                        calls=[],
-                        dependencies=[],
-                        docstring=content,
-                        decorators=[]
-                    )
-                    symbols.append(sym)
+                    if file_path.stat().st_size <= MAX_FILE_SIZE:
+                        content = file_path.read_text(encoding="utf-8", errors="ignore")
+                        if len(content) > 2000:
+                            content = content[:2000] + "..."
+                        sym = Symbol(
+                            type="file",
+                            name=target_file,
+                            file=target_file,
+                            language="Config",
+                            start_line=1,
+                            end_line=content.count('\n') + 1,
+                            calls=[],
+                            dependencies=[],
+                            docstring=content,
+                            decorators=[]
+                        )
+                        symbols.append(sym)
                 except Exception:
                     pass
-                
+
         index_symbols(db, repo_id, symbols)
-        
+
         records = db.query(SymbolRecord).filter(SymbolRecord.repository_name == repo_id).all()
         for record in records:
-            text_to_embed = f"{record.name}: {record.docstring or ''}"
-            emb = generate_embedding(text_to_embed)
-            store_embedding(db, record.id, emb)
-            
-        # Build and persist knowledge graph during ingestion
+            try:
+                text_to_embed = f"{record.name}: {record.docstring or ''}"
+                emb = generate_embedding(text_to_embed)
+                store_embedding(db, record.id, emb)
+            except Exception as emb_err:
+                print(f"Warning: Failed to embed symbol {record.name}: {emb_err}")
+
+        # Build and persist knowledge graph during ingestion (handles empty symbols cleanly)
         graph = build_knowledge_graph(symbols, repo_id=repo_id)
         save_graph(db, repo_id, graph)
 
